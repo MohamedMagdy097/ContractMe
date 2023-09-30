@@ -1,0 +1,67 @@
+<section id="body" class="">
+
+  <div class="chat-container" *ngFor="let chatMessage of allChat">
+    <div class="chat outgoing">
+      <div class="chat-content">
+        <div class="chat-details">
+          <!-- <img [src]="this.picture" [alt]="this.name"> -->
+          <img src="../../assets/user.jpg" alt="user-logo">
+          <p>{{chatMessage.request}}</p>
+        </div>
+      </div>
+    </div>
+  
+    <div class="chat incoming">
+      <div class="chat-content">
+        <div class="chat-details">
+          <img src="../../assets/chatbot.jpg" alt="openAi-logo">
+          <p>{{chatMessage.response}}</p>
+        </div>
+        <button style="background: var(--incoming-chat-bg);border: 0;" type="button"
+            class="clipboard" [cdkCopyToClipboard]="value2">
+            <span class="material-symbols-rounded">
+              <mat-icon >content_copy</mat-icon>
+            </span>
+        </button>
+      </div>
+    </div>
+  
+    <div class="chat incoming" *ngIf="botIsTyping">
+      <div class="chat-content">
+        <div class="chat-details">
+          <img src="../../assets/chatbot.jpg" alt="openAi-logo">
+          <div class="typing-animation">
+            <div class="typing-dot" style="--delay: 0.2s"></div>
+            <div class="typing-dot" style="--delay: 0.3s"></div>
+            <div class="typing-dot" style="--delay: 0.4s"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="typing-container">
+
+    <div class="typing-content">
+      <div class="typing-textarea">
+        <textarea (keyup.enter)="sendprompt()" [(ngModel)]="promptVal" [value]="temp" name="" id="chat-input"
+         placeholder="Enter a prompt here" required></textarea>
+
+        <span (click)="sendprompt()" style="cursor: pointer;" id="send-btn" class="material-symbols-rounded">
+          <mat-icon>send</mat-icon>
+        </span>
+      </div>
+
+      <div class="typing-controls">
+        <span (click)="toggleTheme()" id="theme-btn" class="material-symbols-rounded">
+          <mat-icon>light_mode</mat-icon>
+        </span>
+        <span (click)="deleteVal()" id="delete-btn" class="material-symbols-rounded">
+          <mat-icon>delete</mat-icon>
+        </span>
+      </div>
+    </div>
+
+  </div>
+
+</section>
