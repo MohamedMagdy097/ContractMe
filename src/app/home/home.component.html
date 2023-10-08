@@ -1,67 +1,209 @@
-<section id="body" class="">
+<mat-sidenav-container>
+  <mat-sidenav #sidenav opened (opened)="log('opened')" (closed)="log('closed')" mode="side">
 
-  <div class="chat-container" *ngFor="let chatMessage of allChat">
-    <div class="chat outgoing">
-      <div class="chat-content">
-        <div class="chat-details">
-          <!-- <img [src]="this.picture" [alt]="this.name"> -->
-          <img src="../../assets/user.jpg" alt="user-logo">
-          <p>{{chatMessage.request}}</p>
-        </div>
-      </div>
-    </div>
-  
-    <div class="chat incoming">
-      <div class="chat-content">
-        <div class="chat-details">
-          <img src="../../assets/chatbot.jpg" alt="openAi-logo">
-          <p>{{chatMessage.response}}</p>
-        </div>
-        <button style="background: var(--incoming-chat-bg);border: 0;" type="button"
-            class="clipboard" [cdkCopyToClipboard]="value2">
-            <span class="material-symbols-rounded">
-              <mat-icon >content_copy</mat-icon>
-            </span>
+    <div id="sideNavbar">
+      <h2 style="margin-bottom: 5px;">ContractGPT</h2>
+      
+      <div id="side">
+        <p (click)="newChat()">+ New Chat</p>
+        <button id="toggle2" (click)="sidenav.toggle()">
+          <mat-icon>swap_horiz</mat-icon>
         </button>
       </div>
-    </div>
-  
-    <div class="chat incoming" *ngIf="botIsTyping">
-      <div class="chat-content">
-        <div class="chat-details">
-          <img src="../../assets/chatbot.jpg" alt="openAi-logo">
-          <div class="typing-animation">
-            <div class="typing-dot" style="--delay: 0.2s"></div>
-            <div class="typing-dot" style="--delay: 0.3s"></div>
-            <div class="typing-dot" style="--delay: 0.4s"></div>
+
+      <div id="chatHistory">
+        <ul>
+          <div *ngFor="let chatMessage of wholeChat; let isLast = last; let isFirst = first;"> 
+
+            <li *ngIf="chatMessage.response" (click)="changeConv(chatMessage)">{{chatMessage.response}}</li>
           </div>
+        </ul>
+      </div>
+
+      <div id="googleBtn" class="dropdown">
+        <ng-container *ngIf="loggedIn; else loggedOut">
+          <div id="userInfo">
+
+            <button class="dropdown-content" *ngIf="this.showLogoutBtn" 
+              id="logoutBtn" type="button" (click)="logout()" mat-button>
+              Logout
+            </button>
+
+            <div id="user" (click)="showLogout()">
+              <ng-container *ngIf="googleId && name && email && picture">
+                <p>{{email}}</p>
+                <img [src]="picture" alt="user picture">
+                <!-- <img src="picture" alt=""> -->
+              </ng-container>
+            </div>
+          </div>
+        </ng-container>
+        
+        <ng-template #loggedOut>
+          <button mat-button id="loginBtn" type="button" (click)="authServe.loginWithRedirect()">
+            Continue Using Google
+            <img src="https://img.icons8.com/color/16/000000/google-logo.png">
+          </button>
+        </ng-template>
+      </div>
+
+  </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    
+    <div id="chat-container" class="chat-container"  #chatContainer>
+
+      <div id="dialog-box" *ngIf="this.formDialog">
+        <div class="wrapper">
+          
+          <form class="form-signin" (ngSubmit)="sendSign()">
+            <div class="x">
+              <button type="button" mat-button (click)="toggleForm()"><span class="material-symbols-rounded">
+                <mat-icon >close</mat-icon>
+              </span></button>
+            </div>
+
+            <div>
+              <label for="signer2">Second Party</label><br>
+              <input type="email" class="form-control" name="signer2" id="signer2" [(ngModel)]="signer2" placeholder="example@email.com"/>
+            </div>
+
+            <div>
+              <label for="lawyer1">Cc Email Adress 1</label><br>
+              <input type="email" class="form-control" name="lawyer1" id="lawyer1" [(ngModel)]="cc[0]" placeholder="example@email.com"/>
+            </div>
+
+            <div>
+              <label for="lawyer2">Cc Email Adress 2</label><br>
+              <input type="email" class="form-control" name="lawyer2" id="lawyer2" [(ngModel)]="cc[1]" placeholder="example@email.com"/>
+            </div>
+
+            <div>
+              <label for="title">Title</label><br>
+              <input type="text" class="form-control" name="title" id="title" [(ngModel)]="title" placeholder="Title" />
+            </div>
+
+            <div>
+              <label for="subject">Subject</label><br>
+              <input type="text" class="form-control" name="subject" id="subject" [(ngModel)]="subject" placeholder="Subject"/>
+            </div>
+        
+            <div>
+              <label for="message">Message</label>
+              <textarea class="form-control" placeholder="Message" name="message" id="message" [(ngModel)]="message" cols="30" rows="7"
+                        style="margin-top: 15px;
+                        margin-bottom: 15px;
+                        border-bottom-left-radius: 0;
+                        border-bottom-right-radius: 0;
+                        border: 1px solid #00695C;"></textarea>
+            </div>
+
+
+            
+            <div class="x">
+              <button class="bttn" type="submit">Send E-Signature</button>
+            </div>
+          </form>
+          <h3 style="color: green; text-align: center;"></h3>
         </div>
       </div>
-    </div>
-  </div>
-  
-  <div class="typing-container">
 
-    <div class="typing-content">
-      <div class="typing-textarea">
-        <textarea (keyup.enter)="sendprompt()" [(ngModel)]="promptVal" [value]="temp" name="" id="chat-input"
-         placeholder="Enter a prompt here" required></textarea>
+      
+      <button id="toggle1" (click)="sidenav.toggle()">
+        <mat-icon>swap_horiz</mat-icon>
+      </button>
+    
+      <div *ngIf="this.aiRes">
+    
+        <div class="chat incoming" *ngIf="botIsTyping">
+          <div class="chat-content">
+            <div class="chat-details">
+              <!-- <img src="../../assets/chatbot.jpg" alt="openAi-logo"> -->
+              <div class="typing-animation">
+                <div class="typing-dot" style="--delay: 0.2s"></div>
+                <div class="typing-dot" style="--delay: 0.3s"></div>
+                <div class="typing-dot" style="--delay: 0.4s"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+    
+        <div class="chat incoming" *ngIf="!botIsTyping">
+          
+          <div class="chat-content">
 
-        <span (click)="sendprompt()" style="cursor: pointer;" id="send-btn" class="material-symbols-rounded">
-          <mat-icon>send</mat-icon>
-        </span>
+            <div class="chat-details">
+              <!-- <img src="../../assets/chatbot.jpg" alt="openAi-logo" > -->
+              <div id="aiRes">
+                <p *ngIf="!this.editMode">{{this.aiRes}}</p><br>
+              </div>
+
+              <div id="options" class="x">
+                <button style="color: white;background: rgb(220, 53, 69);"
+                *ngIf="!this.editMode" mat-button type="button" (click)="risk()">
+                  Risk Assessment
+                </button>
+
+                <button style="color: white;background: rgb(25, 135, 84)"
+                *ngIf="!this.editMode" mat-button type="button" (click)="spell()">
+                  Spell / Grammar Check
+                </button>
+
+                <button style="color: white;background: rgb(31, 32, 35)"
+                  *ngIf="!this.editMode" mat-button type="button" (click)="toggleForm()">
+                > Signature form
+                </button>
+              </div>
+
+              <textarea [(ngModel)]="this.aiRes" [value]="this.aiRes" *ngIf="this.editMode"></textarea>
+            </div>
+            <button *ngIf="!this.editMode" style="background: var(--incoming-chat-bg);border: 0;" type="button"
+                class="clipboard" [cdkCopyToClipboard]="this.aiRes">
+                <span class="material-symbols-rounded">
+                  <mat-icon >content_copy</mat-icon>
+                </span>
+            </button>
+          </div>
+        </div>
+    
       </div>
-
-      <div class="typing-controls">
-        <span (click)="toggleTheme()" id="theme-btn" class="material-symbols-rounded">
-          <mat-icon>light_mode</mat-icon>
-        </span>
-        <span (click)="deleteVal()" id="delete-btn" class="material-symbols-rounded">
-          <mat-icon>delete</mat-icon>
-        </span>
-      </div>
     </div>
+    
+    <div class="typing-container">
+      
+      <div class="typing-content">
+        <div class="typing-textarea">
+          <textarea *ngIf="this.loggedIn" (keyup.enter)="sendprompt()" [(ngModel)]="promptVal" [value]="temp"
+            name="" id="chat-input" [placeholder]="placeH" required></textarea>
+    
+          <span (click)="sendprompt()" style="cursor: pointer" id="send-btn" class="material-symbols-rounded">
+            <mat-icon>send</mat-icon>
+          </span>
+        </div>
+    
+        <div class="typing-controls">
+          <span (click)="toggleEdit()" class="material-symbols-rounded">
+            <mat-icon *ngIf="!this.editMode">edit</mat-icon>
+            <mat-icon *ngIf="this.editMode">close</mat-icon>
+          </span>
+          <span  *ngIf="this.editMode" (click)="updateChat(this.aiRes)" class="material-symbols-rounded">
+            <mat-icon>save</mat-icon>
+          </span>
+          <span (click)="deleteVal()" class="material-symbols-rounded">
+            <mat-icon>delete</mat-icon>
+          </span>
+          <span *ngIf="this.internetMode" (click)="internetToggle()" class="material-symbols-rounded">
+            <mat-icon>signal_wifi_off</mat-icon>
+          </span>
+          <span *ngIf="!this.internetMode" (click)="internetToggle()" class="material-symbols-rounded">
+            <mat-icon>signal_wifi_4_bar</mat-icon>
+          </span>
+        </div>
+      </div>
+     
+    </div>
+    
+  </mat-sidenav-content>
+</mat-sidenav-container>
 
-  </div>
-
-</section>
