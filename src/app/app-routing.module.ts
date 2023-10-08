@@ -9,6 +9,7 @@ const routes: Routes = [
   //{path: 'login', component: LoginComponent},
   {path: '', component: HomeComponent},
 
+
   {path: '**', component: PageNotFoundComponent},
 ];
 
@@ -16,4 +17,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

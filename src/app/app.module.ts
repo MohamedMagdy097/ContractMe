@@ -12,6 +12,10 @@ import { AuthModule } from '@auth0/auth0-angular';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { ClipboardModule } from '@angular/cdk/clipboard';
+import {MatSidenavModule} from '@angular/material/sidenav';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 @NgModule({
   declarations: [
@@ -33,7 +37,11 @@ import { ClipboardModule } from '@angular/cdk/clipboard';
     }),
     FormsModule,
     MatIconModule,
-    ClipboardModule
+    ClipboardModule,
+    MatSidenavModule,
+    BrowserAnimationsModule,
+    MatButtonModule,
+    MatCheckboxModule
   ],
   providers: [],
   bootstrap: [AppComponent]
